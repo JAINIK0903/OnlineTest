@@ -124,6 +124,8 @@ namespace OnlineTest.Models.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("TestId");
+
                     b.ToTable("Questions");
                 });
 
@@ -247,6 +249,54 @@ namespace OnlineTest.Models.Migrations
                     b.ToTable("Tests");
                 });
 
+            modelBuilder.Entity("OnlineTest.Models.TestLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime?>("AccessOn")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("int");
+
+                    b.Property<int>("CreatedBy")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedOn")
+                        .HasColumnType("datetime");
+
+                    b.Property<DateTime>("ExpireOn")
+                        .HasColumnType("datetime");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("SubmitOn")
+                        .HasColumnType("datetime");
+
+                    b.Property<int>("TestId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("Token")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TestId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("TestLinks");
+                });
+
             modelBuilder.Entity("OnlineTest.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -329,6 +379,17 @@ namespace OnlineTest.Models.Migrations
                     b.Navigation("test");
                 });
 
+            modelBuilder.Entity("OnlineTest.Models.Question", b =>
+                {
+                    b.HasOne("OnlineTest.Models.Test", "TId")
+                        .WithMany()
+                        .HasForeignKey("TestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("TId");
+                });
+
             modelBuilder.Entity("OnlineTest.Models.RToken", b =>
                 {
                     b.HasOne("OnlineTest.Models.User", "UserNavigation")
@@ -349,6 +410,25 @@ namespace OnlineTest.Models.Migrations
                         .IsRequired();
 
                     b.Navigation("Technology");
+                });
+
+            modelBuilder.Entity("OnlineTest.Models.TestLink", b =>
+                {
+                    b.HasOne("OnlineTest.Models.Test", "Test")
+                        .WithMany()
+                        .HasForeignKey("TestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OnlineTest.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Test");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("OnlineTest.Models.UserRole", b =>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using OnlineTest.Models;
 using OnlineTest.Services.DTO;
 using OnlineTest.Services.DTO.AddDTO;
 using OnlineTest.Services.DTO.UpdateDTO;
@@ -17,16 +18,18 @@ namespace OnlineTest.Controllers
     {
         #region Fields
         private readonly IUserService _userService;
+        private readonly IUserRoleService _userRoleService;
         private readonly IRTokenService _rTokenService;
         private readonly IConfiguration _configuration;
         #endregion
 
         #region Constructor
-        public AuthController(IUserService userService, IRTokenService rTokenService, IConfiguration configuration)
+        public AuthController(IUserService userService,IUserRoleService userRoleService ,IRTokenService rTokenService, IConfiguration configuration)
         {
             _userService = userService;
             _rTokenService = rTokenService;
             _configuration = configuration.GetSection("JWTConfig");
+            _userRoleService = userRoleService;
         }
         #endregion
 
@@ -128,13 +131,16 @@ namespace OnlineTest.Controllers
         {
             var now = DateTime.UtcNow;
 
-            // jwt claims
-            var claims = new[]
+            var claims = new List<Claim>
             {
                 new Claim(JwtRegisteredClaimNames.Iat, now.ToString(CultureInfo.InvariantCulture), ClaimValueTypes.Integer64),
                 new Claim("Id", Convert.ToString(Id))
-                // roles
             };
+            var roles = _userRoleService.GetRoles(Id);
+            foreach (var role in roles)
+            {
+                claims.Add(new Claim("Role", role));
+            }
 
             // signing key
             var symmetricKeyAsBase64 = _configuration["SecretKey"];

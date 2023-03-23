@@ -16,6 +16,7 @@ namespace OnlineTest.Services.Interface
         ResponseDTO GetTestsByTechnologyId(int technologyId);
         ResponseDTO GetTestsById(int id);
         ResponseDTO AddTestDTO(AddTestDTO test);
+        ResponseDTO AddTestLink(int adminId, int testId, string email);
         ResponseDTO UpdateTestDTO(UpdateTestDTO test);
         ResponseDTO DeleteTest(int id);
     }

@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OnlineTest.Services.DTO.Add_DTO;
+using OnlineTest.Services.DTO.AddDTO;
 using OnlineTest.Services.DTO.UpdateDTO;
-using OnlineTest.Services.Interface;
+using OnlineTest.Services.Interfaces;
 
 namespace OnlineTest.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
+    [Authorize]
     public class TestController : ControllerBase
     {
         #region Fields
@@ -38,25 +39,31 @@ namespace OnlineTest.Controllers
         [HttpGet("id")]
         public IActionResult GetTestById(int id)
         {
-            return Ok(_testService.GetTestsById(id));
+            return Ok(_testService.GetTestById(id));
         }
 
         [HttpPost]
         public IActionResult AddTest(AddTestDTO test)
         {
-            return Ok(_testService.AddTestDTO(test));
+            return Ok(_testService.AddTest(Convert.ToInt32(User.FindFirstValue("Id")), test));
         }
 
         [HttpPut]
         public IActionResult UpdateTest(UpdateTestDTO test)
         {
-            return Ok(_testService.UpdateTestDTO(test));
+            return Ok(_testService.UpdateTest(test));
         }
 
         [HttpDelete]
         public IActionResult DeleteTest(int id)
         {
             return Ok(_testService.DeleteTest(id));
+        }
+
+        [HttpPost("link")]
+        public IActionResult AddTestLink(int testId, string email)
+        {
+            return Ok(_testService.AddTestLink(Convert.ToInt32(User.FindFirstValue("Id")), testId, email));
         }
         #endregion
     }

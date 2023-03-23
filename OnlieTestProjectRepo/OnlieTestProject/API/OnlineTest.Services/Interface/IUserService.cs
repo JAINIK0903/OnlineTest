@@ -1,5 +1,4 @@
-﻿using Azure;
-using OnlineTest.Services.DTO;
+﻿using OnlineTest.Services.DTO;
 using OnlineTest.Services.DTO.UpdateDTO;
 
 namespace OnlineTest.Services.Interface

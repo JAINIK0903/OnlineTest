@@ -1,133 +1,60 @@
-﻿using OnlineTest.Models.Interfaces;
+﻿using AutoMapper;
 using OnlineTest.Models;
+using OnlineTest.Models.Interfaces;
 using OnlineTest.Services.DTO;
-using OnlineTest.Services.Interface;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using OnlineTest.Models.Repository;
-using Azure.Core;
-using AutoMapper;
-using OnlineTest.Services.DTO.Add_DTO;
+using OnlineTest.Services.DTO.AddDTO;
+using OnlineTest.Services.DTO.GetDTO;
 using OnlineTest.Services.DTO.UpdateDTO;
-using OnlineTest.Services.DTO.Get_DTO;
+using OnlineTest.Services.Interfaces;
 
 namespace OnlineTest.Services.Services
 {
     public class TestService : ITestService
     {
-        
         #region Fields
-        private readonly ITestRepository _testRepository;
-        private readonly ITechnologyRepository _technologyRepository;
         private readonly IMapper _mapper;
+        private readonly ITestRepository _testRepository;
+        private readonly IQuestionRepository _questionRepository;
+        private readonly IAnswerRepository _answerRepository;
+        private readonly ITechnologyRepository _technologyRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly ITestLinkRepository _testLinkRepository;
         #endregion
 
-        #region Constructor        
-        public TestService(ITestRepository testRepository, IMapper mapper, ITechnologyRepository technologyRepository)
+        #region Constructor
+        public TestService(IMapper mapper, ITestRepository testRepository, IQuestionRepository questionRepository, IAnswerRepository answerRepository, ITechnologyRepository technologyRepository, ITestLinkRepository testLinkRepository, IUserRepository userRepository)
         {
-            _testRepository = testRepository;
             _mapper = mapper;
+            _testRepository = testRepository;
+            _questionRepository = questionRepository;
+            _answerRepository = answerRepository;
             _technologyRepository = technologyRepository;
+            _testLinkRepository = testLinkRepository;
+            _userRepository = userRepository;
         }
-        
         #endregion
 
-        #region Methods        
-        public ResponseDTO GetTestsDTO()
-        {
-            var response= new ResponseDTO();
-            try { 
-            {
-                
-                    var data= _mapper.Map<List<TestDTO>>(_testRepository.GetTests()).ToList();
-                if(data.Count>0) 
-                    {
-                        response.Status = 200;
-                        response.Message = "test is succesfully fetched";
-                        response.Data = data;
-                    }
-            }
-            }
-            catch (Exception ex) 
-            {
-                response.Status = 500;
-                response.Message = "test is not fetched internal server error";
-            }
-            return response;
-        }
-
-
-        public ResponseDTO AddTestDTO(AddTestDTO test)
-        {
-            var response=new ResponseDTO();
-            try
-            {
-                var result= _testRepository.AddTest(_mapper.Map<Test>(test));
-
-                if(result)
-                {
-                    response.Status = 200;
-                    response.Message = "Test is successfully added";
-                    response.Data = result;
-                }
-            }
-            catch(Exception ex) 
-            {
-                response.Status=500;
-                response.Message = "test is not added internal server error";
-            }
-            return response;
-        }
-        public ResponseDTO UpdateTestDTO(UpdateTestDTO test)
+        #region Methods
+        public ResponseDTO GetTests()
         {
             var response = new ResponseDTO();
             try
             {
-                var result = _testRepository.UpdateTest(_mapper.Map<Test>(test));
-                
-                if (result)
-                {
-                    response.Status = 204;
-                    response.Message = "test is updated successfully";
-                    response.Data = result;
-                }
+                var data = _mapper.Map<List<GetTestDTO>>(_testRepository.GetTests().ToList());
+                response.Status = 200;
+                response.Message = "Ok";
+                response.Data = data;
             }
-            catch(Exception ex) 
-            {
-                response.Status=500;
-                response.Message="changes are not done internal server error ";
-                response.Error=ex.Message;
-            }
-            return response;
-        }
-        public ResponseDTO GetTestsPaginated(int pageNumber, int pageSize)
-        {
-            var response = new ResponseDTO();
-            try
-            {
-                
-                    
-                    
-                    var data = _mapper.Map<List<GetTestsDTO>>(_testRepository.GetTestsPaginated(pageNumber, pageSize)).ToList();
-                    response.Status = 200;
-                        response.Message = "test is successfully fetched using gettestpaginated.";
-                        response.Data = data;
-
-                    
-                
-            }
-            catch (Exception ex) 
+            catch (Exception e)
             {
                 response.Status = 500;
-                response.Message = "gettestpaginated is not fetch any data internal server error";
-                response.Error=ex.Message;
+                response.Message = "Internal Server Error";
+                response.Error = e.Message;
             }
             return response;
         }
-        public ResponseDTO GetTestsById(int id)
+
+        public ResponseDTO GetTestById(int id)
         {
             var response = new ResponseDTO();
             try
@@ -135,27 +62,51 @@ namespace OnlineTest.Services.Services
                 var test = _testRepository.GetTestById(id);
                 if (test == null)
                 {
-                    response.Status = 400;
+                    response.Status = 404;
                     response.Message = "Not Found";
-                    response.Error = "test not found";
+                    response.Error = "Test not found";
                     return response;
                 }
-                if (test!=null)
+                var data = _mapper.Map<GetTestDTO>(test);
+                var questionsList = _mapper.Map<List<GetQuestionDTO>>(_questionRepository.GetQuestionsByTestId(test.Id).ToList());
+                foreach (var question in questionsList)
                 {
-                    var data = _mapper.Map<GetTestsDTO>(test);
-                    response.Status=200;
-                    response.Message ="test data is successfully fetched using gettestsbyid";
-                    response.Data = test;
+                    var answersList = _mapper.Map<List<GetAnswerDTO>>(_answerRepository.GetAnswersByQuestionId(question.Id).ToList());
+                    question.Answers = answersList;
                 }
+                data.Questions = questionsList;
+                response.Status = 200;
+                response.Message = "Ok";
+                response.Data = data;
             }
-            catch(Exception ex) 
-            { 
+            catch (Exception e)
+            {
                 response.Status = 500;
-                response.Message = "test is not fetched using gettestsbyid internal server error";
-                response.Error=ex.Message;
+                response.Message = "Internal Server Error";
+                response.Error = e.Message;
             }
             return response;
         }
+
+        public ResponseDTO GetTestsPaginated(int page, int limit)
+        {
+            var response = new ResponseDTO();
+            try
+            {
+                var data = _mapper.Map<List<GetTestDTO>>(_testRepository.GetTestsPaginated(page, limit).ToList());
+                response.Status = 200;
+                response.Message = "Ok";
+                response.Data = data;
+            }
+            catch (Exception e)
+            {
+                response.Status = 500;
+                response.Message = "Internal Server Error";
+                response.Error = e.Message;
+            }
+            return response;
+        }
+
         public ResponseDTO GetTestsByTechnologyId(int technologyId)
         {
             var response = new ResponseDTO();
@@ -169,7 +120,7 @@ namespace OnlineTest.Services.Services
                     response.Error = "Technology not found";
                     return response;
                 }
-                var data = _mapper.Map<List<GetTestsDTO>>(_testRepository.GetTestsByTechnologyId(technologyId).ToList());
+                var data = _mapper.Map<List<GetTestDTO>>(_testRepository.GetTestsByTechnologyId(technologyId).ToList());
                 response.Status = 200;
                 response.Message = "Ok";
                 response.Data = data;
@@ -182,6 +133,95 @@ namespace OnlineTest.Services.Services
             }
             return response;
         }
+
+        public ResponseDTO AddTest(int userId, AddTestDTO test)
+        {
+            var response = new ResponseDTO();
+            try
+            {
+                var technologyById = _technologyRepository.GetTechnologyById(test.TechnologyId);
+                if (technologyById == null)
+                {
+                    response.Status = 400;
+                    response.Message = "Bad Request";
+                    response.Error = "Technology does not exist";
+                    return response;
+                }
+                var testExist = _testRepository.TestExists(_mapper.Map<Test>(test));
+                if (testExist != null)
+                {
+                    response.Status = 400;
+                    response.Message = "Not Created";
+                    response.Error = "Test already exists";
+                    return response;
+                }
+                test.IsActive = true;
+                test.CreatedBy = userId;
+                test.CreatedOn = DateTime.UtcNow;
+                var testId = _testRepository.AddTest(_mapper.Map<Test>(test));
+                if (testId == 0)
+                {
+                    response.Status = 400;
+                    response.Message = "Not Created";
+                    response.Error = "Could not add test";
+                    return response;
+                }
+                response.Status = 201;
+                response.Message = "Created";
+                response.Data = testId;
+            }
+            catch (Exception e)
+            {
+                response.Status = 500;
+                response.Message = "Internal Server Error";
+                response.Error = e.Message;
+            }
+            return response;
+        }
+
+        public ResponseDTO UpdateTest(UpdateTestDTO test)
+        {
+            var response = new ResponseDTO();
+            try
+            {
+                var testById = _testRepository.GetTestById(test.Id);
+                if (testById == null)
+                {
+                    response.Status = 404;
+                    response.Message = "Not Found";
+                    response.Error = "Test does not exist";
+                    return response;
+                }
+                var testExist = _testRepository.TestExists(_mapper.Map<Test>(test));
+                if (testExist != null && test.Id != testExist.Id)
+                {
+                    response.Status = 400;
+                    response.Message = "Not Updated";
+                    response.Error = "Test already exists";
+                    return response;
+                }
+                var updateFlag = _testRepository.UpdateTest(_mapper.Map<Test>(test));
+                if (updateFlag)
+                {
+                    response.Status = 204;
+                    response.Message = "Updated";
+                }
+                else
+                {
+                    response.Status = 400;
+                    response.Message = "Not Updated";
+                    response.Error = "Could not update test";
+                }
+            }
+            catch (Exception e)
+            {
+                response.Status = 500;
+                response.Message = "Internal Server Error";
+                response.Error = e.Message;
+            }
+            return response;
+        }
+
         public ResponseDTO DeleteTest(int id)
         {
             var response = new ResponseDTO();
@@ -217,7 +257,74 @@ namespace OnlineTest.Services.Services
             }
             return response;
         }
+        
+        public ResponseDTO AddTestLink(int adminId, int testId, string email)
+        {
+            var response = new ResponseDTO();
+            try
+            {
+                // check if user exists
+                var userByEmail = _userRepository.GetUserByEmail(email);
+                if (userByEmail == null)
+                {
+                    response.Status = 400;
+                    response.Message = "Not Created";
+                    response.Error = "User does not exist";
+                    return response;
+                }
+
+                // check if test exists
+                var testById = _testRepository.GetTestById(testId);
+                if (testById == null)
+                {
+                    response.Status = 400;
+                    response.Message = "Not Created";
+                    response.Error = "Test does not exist";
+                    return response;
+                }
+
+                // check if link has already been created and not expired
+                var existFlag = _testLinkRepository.IsTestLinkExists(testId, userByEmail.Id);
+                if (existFlag)
+                {
+                    response.Status = 400;
+                    response.Message = "Not Created";
+                    response.Error = "Test link already exists";
+                    return response;
+                }
+
+                var testLink = new AddTLinkDTO
+                {
+                    TestId = testId,
+                    UserId = userByEmail.Id,
+                    Token = Guid.NewGuid(),
+                    Attempts = 0,
+                    ExpireOn = DateTime.UtcNow.AddDays(7),
+                    IsActive = true,
+                    CreatedBy = adminId,
+                    CreatedOn = DateTime.UtcNow,
+                };
+
+                var testLinkId = _testLinkRepository.AddTestLink(_mapper.Map<TestLink>(testLink));
+                if (testLinkId == 0)
+                {
+                    response.Status = 400;
+                    response.Message = "Not Created";
+                    response.Error = "Could not add test link";
+                    return response;
+                }
+                response.Status = 201;
+                response.Message = "Created";
+                response.Data = testLinkId;
+            }
+            catch (Exception e)
+            {
+                response.Status = 500;
+                response.Message = "Internal Server Error";
+                response.Error = e.Message;
+            }
+            return response;
+        }
         #endregion
     }
-
 }

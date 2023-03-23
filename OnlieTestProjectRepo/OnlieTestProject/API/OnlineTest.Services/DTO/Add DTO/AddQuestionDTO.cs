@@ -11,15 +11,19 @@ namespace OnlineTest.Services.DTO.Add_DTO
 {
     public class AddQuestionDTO
     {
-        [Required]
+        [Required(ErrorMessage = "Index name is required")]
         [StringLength(20)]
         public string QuestionName { get; set; }
-        [Required]
+        [Required(ErrorMessage = "Question is required")]
         [StringLength(100)]
         public string Que { get; set; }
+        [Required(ErrorMessage = "{0} is required")]
         public int TestId { get; set; }
+        [Required(ErrorMessage = "Question type is required")]
         public int Type { get; set; }
+        [Required(ErrorMessage = "Weightage is required")]
         public int Weightage { get; set; }
+        [Required(ErrorMessage = "Order is required")]
         public int SortOrder { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime CreatedOn { get; set; }= DateTime.Now;

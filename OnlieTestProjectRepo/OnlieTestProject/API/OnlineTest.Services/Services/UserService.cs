@@ -1,143 +1,43 @@
 ﻿using AutoMapper;
-using Microsoft.EntityFrameworkCore;
 using OnlineTest.Models;
 using OnlineTest.Models.Interfaces;
 using OnlineTest.Services.DTO;
+using OnlineTest.Services.DTO.AddDTO;
+using OnlineTest.Services.DTO.GetDTO;
 using OnlineTest.Services.DTO.UpdateDTO;
-using OnlineTest.Services.Interface;
-
+using OnlineTest.Services.Interfaces;
 
 namespace OnlineTest.Services.Services
 {
     public class UserService : IUserService
     {
         #region Fields
-        private readonly IUserRepository _userRepository;
         private readonly IMapper _mapper;
+        private readonly IUserRepository _userRepository;
+        private readonly IUserRoleRepository _userRoleRepository;
         private readonly IHasherService _hasherService;
         #endregion
 
-        #region Constructor        
-        public UserService(IUserRepository userRepository, IMapper mapper, IHasherService hasherService)
+        #region Constructor
+        public UserService(IMapper mapper, IUserRepository userRepository, IUserRoleRepository userRoleRepository, IHasherService hasherService)
         {
-            _userRepository = userRepository;
             _mapper = mapper;
+            _userRepository = userRepository;
+            _userRoleRepository = userRoleRepository;
             _hasherService = hasherService;
         }
-        
         #endregion
 
-        #region Methods        
-        public ResponseDTO GetUserDTO()
+        #region Methods
+        public ResponseDTO GetUsers()
         {
             var response = new ResponseDTO();
             try
             {
-                var data= _mapper.Map<List<GetUserDTO>>(_userRepository.GetUsers()).ToList();
-                response.Status = 200;
-                response.Message = "ok";
-                response.Data = data;
-            }
-            catch (Exception ex)
-            {
-                response.Status = 500;
-                response.Message = "Internal Server Error";
-                response.Error = ex.Message;
-            }
-            return response;
-        }
-        public ResponseDTO GetUsersPaginated(int pageNumber, int pageSize)
-        {
-            var response = new ResponseDTO();
-            try
-            {
-                
-                var data = _mapper.Map<List<User>>(_userRepository.GetUsersPaginated(pageNumber,pageSize)).ToList();
-                
+                var data = _mapper.Map<List<GetUserDTO>>(_userRepository.GetUsers().ToList());
                 response.Status = 200;
                 response.Message = "Ok";
                 response.Data = data;
-            }
-            catch (Exception ex)
-            {
-                response.Status = 500;
-                response.Message = "Internal Server Error";
-                response.Error = ex.Message;
-            }
-            return response;
-
-        }
-        public ResponseDTO GetUserById(int id)
-        {
-            var response = new ResponseDTO();
-            {
-                var user = _userRepository.GetUserById(id);
-                if (user == null)
-                {
-                    response.Status = 404;
-                    response.Message = "Not Found";
-                    response.Error = "User not found";
-                    return response;
-                }
-                
-                var data=_mapper.Map<GetUserDTO>(user);
-                if (user!=null)
-                {
-                    response.Status = 200;
-                    response.Message = "user is successfully fetched";
-                    response.Data = data;
-                }
-               
-            }
-            return response;
-        }
-        public ResponseDTO GetUserByEmail(string email)
-        {
-            var response = new ResponseDTO();
-            try
-            {
-                var user = _userRepository.GetUserByEmail(email);
-                if (user == null)
-                { 
-                    response.Status=404;
-                    response.Message = "Not Found";
-                    response.Error = "User not found";
-                }
-                
-                var data= _mapper.Map<GetUserDTO>(user);
-            }
-            catch (Exception ex)
-            {
-                response.Status = 500;
-                response.Message = "user not found using email";
-                response.Error = ex.Message;
-            }
-            return response;
-        }
-
-        public ResponseDTO AddUserDTO(AddUserDTO user)
-        {
-            var response = new ResponseDTO();
-            try
-            {
-                var userByEmail = GetUserByEmail(user.Email);
-                if (userByEmail == null)
-                {
-                    response.Status = 400;
-                    response.Message = "Bad Request";
-                    response.Error = "Email already exist";
-                    response.Data = userByEmail;
-                    return response;
-                }
-                user.Password=_hasherService.Hash(user.Password);
-                var result = _userRepository.AddUser(_mapper.Map<User>(user));   
-                
-                if(result!=null) 
-                {
-                    response.Status = 200;
-                    response.Message = "user is successfully added";
-                    response.Data = result;
-                }
             }
             catch (Exception e)
             {
@@ -148,35 +48,168 @@ namespace OnlineTest.Services.Services
             return response;
         }
 
-        public ResponseDTO UpdateUserDTO(UpdateUserDTO user)
+        public ResponseDTO GetUsersPaginated(int page, int limit)
         {
             var response = new ResponseDTO();
             try
             {
-                var result = _userRepository.UpdateUser(new Models.User
-                {
-                    Id = user.Id,
-                    Name = user.Name,
-                    MobileNo = user.MobileNo,
-                    Email = user.Email,
-                    Password = user.Password,
-                    //IsActive = user.IsActive
-
-                });
-                var data= _mapper.Map<UserDTO>(result);
-                if (result)
-                {
-                    response.Status = 204;
-                    response.Message = "user updated";
-                    response.Data = result;
-                }
-
-                return response;
+                var data = _mapper.Map<List<GetUserDTO>>(_userRepository.GetUsersPaginated(page, limit).ToList());
+                response.Status = 200;
+                response.Message = "Ok";
+                response.Data = data;
             }
             catch (Exception e)
             {
                 response.Status = 500;
-                response.Message = "user not added";
+                response.Message = "Internal Server Error";
+                response.Error = e.Message;
+            }
+            return response;
+        }
+
+        public ResponseDTO GetUserById(int id)
+        {
+            var response = new ResponseDTO();
+            try
+            {
+                var user = _userRepository.GetUserById(id);
+                if (user == null)
+                {
+                    response.Status = 404;
+                    response.Message = "Not Found";
+                    response.Error = "User not found";
+                    return response;
+                }
+                var data = _mapper.Map<GetUserDTO>(user);
+                response.Status = 200;
+                response.Message = "Ok";
+                response.Data = data;
+            }
+            catch (Exception e)
+            {
+                response.Status = 500;
+                response.Message = "Internal Server Error";
+                response.Error = e.Message;
+            }
+            return response;
+        }
+
+        public ResponseDTO GetUserByEmail(string email)
+        {
+            var response = new ResponseDTO();
+            try
+            {
+                var user = _userRepository.GetUserByEmail(email);
+                if (user == null)
+                {
+                    response.Status = 404;
+                    response.Message = "Not Found";
+                    response.Error = "User not found";
+                    return response;
+                }
+                var data = _mapper.Map<GetUserDTO>(user);
+                response.Status = 200;
+                response.Message = "Ok";
+                response.Data = data;
+            }
+            catch (Exception e)
+            {
+                response.Status = 500;
+                response.Message = "Internal Server Error";
+                response.Error = e.Message;
+            }
+            return response;
+        }
+
+        public ResponseDTO AddUser(AddUserDTO user)
+        {
+            var response = new ResponseDTO();
+            try
+            {
+                var userByEmail = _userRepository.GetUserByEmail(user.Email);
+                if (userByEmail != null)
+                {
+                    response.Status = 400;
+                    response.Message = "Not Created";
+                    response.Error = "Email already exists";
+                    return response;
+                }
+                user.Password = _hasherService.Hash(user.Password);
+                user.IsActive = true;
+                var userId = _userRepository.AddUser(_mapper.Map<User>(user));
+                if (userId == 0)
+                {
+                    response.Status = 400;
+                    response.Message = "Not Created";
+                    response.Error = "Could not add user";
+                    return response;
+                }
+                if (user.IsAdmin)
+                {
+                    var roleAdmin = new UserRole
+                    {
+                        UserId = userId,
+                        RoleId = 1
+                    };
+                    _userRoleRepository.AddRole(roleAdmin);
+                }
+                var roleUser = new UserRole
+                {
+                    UserId = userId,
+                    RoleId = 2
+                };
+                _userRoleRepository.AddRole(roleUser);
+                response.Status = 201;
+                response.Message = "Created";
+                response.Data = userId;
+            }
+            catch (Exception e)
+            {
+                response.Status = 500;
+                response.Message = "Internal Server Error";
+                response.Error = e.Message;
+            }
+            return response;
+        }
+
+        public ResponseDTO UpdateUser(UpdateUserDTO user)
+        {
+            var response = new ResponseDTO();
+            try
+            {
+                var userById = _userRepository.GetUserById(user.Id);
+                if (userById == null)
+                {
+                    response.Status = 404;
+                    response.Message = "Not Found";
+                    response.Error = "User not found";
+                    return response;
+                }
+                var userByEmail = _userRepository.GetUserByEmail(user.Email);
+                if (userByEmail != null && userByEmail.Id != user.Id)
+                {
+                    response.Status = 400;
+                    response.Message = "Not Updated";
+                    response.Error = "Email already exists";
+                    return response;
+                }
+                var updateFlag = _userRepository.UpdateUser(_mapper.Map<User>(user));
+                if (updateFlag)
+                {
+                    response.Status = 204;
+                    response.Message = "Updated";
+                }
+                else
+                {
+                    response.Status = 400;
+                    response.Message = "Not Updated";
+                    response.Error = "Could not update user";
+                }
+            }
+            catch (Exception e)
+            {
+                response.Status = 500;
+                response.Message = "Internal Server Error";
                 response.Error = e.Message;
             }
             return response;
@@ -217,6 +250,7 @@ namespace OnlineTest.Services.Services
             }
             return response;
         }
+
         public GetUserDTO IsUserExists(LoginDTO user)
         {
             var result = _userRepository.GetUserByEmail(user.Email);

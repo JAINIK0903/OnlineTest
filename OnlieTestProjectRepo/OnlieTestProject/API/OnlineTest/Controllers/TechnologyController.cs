@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OnlineTest.Services.DTO.Add_DTO;
+using OnlineTest.Services.DTO.AddDTO;
 using OnlineTest.Services.DTO.UpdateDTO;
-using OnlineTest.Services.Interface;
+using OnlineTest.Services.Interfaces;
 
 namespace OnlineTest.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
+    [Authorize]
     public class TechnologyController : ControllerBase
     {
         #region Fields
@@ -26,7 +27,7 @@ namespace OnlineTest.Controllers
         [HttpGet]
         public IActionResult GetTechnologies()
         {
-            return Ok(_technologyService.GetTechnologiesDTO());
+            return Ok(_technologyService.GetTechnologies());
         }
 
         [HttpGet("paginated")]
@@ -44,13 +45,13 @@ namespace OnlineTest.Controllers
         [HttpPost]
         public IActionResult AddTechnology(AddTechnologyDTO technology)
         {
-            return Ok(_technologyService.AddTechnologyDTO(technology));
+            return Ok(_technologyService.AddTechnology(Convert.ToInt32(User.FindFirstValue("Id")), technology));
         }
 
         [HttpPut]
         public IActionResult UpdateTechnology(UpdateTechnologyDTO technology)
         {
-            return Ok(_technologyService.UpdateTechnologyDTO(technology));
+            return Ok(_technologyService.UpdateTechnology(Convert.ToInt32(User.FindFirstValue("Id")), technology));
         }
 
         [HttpDelete]

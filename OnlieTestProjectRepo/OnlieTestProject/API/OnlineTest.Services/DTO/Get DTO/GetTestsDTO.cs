@@ -18,5 +18,7 @@ namespace OnlineTest.Services.DTO.Get_DTO
         //[Column(TypeName = "datetime")] 
         public DateTime ExpireOn { get; set; } 
         public int TechnologyId { get; set;}
+        public List<GetQuestionDTO>? Questions { get; set; }
     }
+}
 }

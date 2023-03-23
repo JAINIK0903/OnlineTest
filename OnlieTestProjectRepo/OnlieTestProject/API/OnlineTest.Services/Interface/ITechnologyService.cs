@@ -12,11 +12,12 @@ namespace OnlineTest.Services.Interface
 {
     public interface ITechnologyService
     {
+        ResponseDTO GetTechnologyByName(string technologyName);
         ResponseDTO GetTechnologiesPaginated(int pageNumber, int pageSize);
         ResponseDTO GetTechnologyById(int id);
-        ResponseDTO GetTechnologiesDTO();
-        ResponseDTO AddTechnologyDTO(AddTechnologyDTO technology);
-        ResponseDTO UpdateTechnologyDTO(UpdateTechnologyDTO technology);
+        ResponseDTO GetTechnologies();
+        ResponseDTO AddTechnology(int Id,AddTechnologyDTO technology);
+        ResponseDTO UpdateTechnology(int Id,UpdateTechnologyDTO technology);
         ResponseDTO DeleteTechnology(int id);
     }
 }

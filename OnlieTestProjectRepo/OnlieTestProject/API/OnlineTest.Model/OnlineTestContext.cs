@@ -18,6 +18,11 @@ namespace OnlineTest.Models {
 
         }
 
+        internal object TestLinks(Guid token)
+        {
+            throw new NotImplementedException();
+        }
+
         public DbSet<User> Users { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
@@ -27,6 +32,8 @@ namespace OnlineTest.Models {
         public  DbSet<Question> Questions { get; set; }
         public DbSet<Answer> Answers { get; set; }
         public DbSet<QueAnsMap> QueAnsMap { get; set;}
+        public DbSet<TestLink> testlinks { get; set; }
+        
 
     }
 }

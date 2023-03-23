@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OnlineTest.Services.DTO;
+using OnlineTest.Services.DTO.AddDTO;
 using OnlineTest.Services.DTO.UpdateDTO;
-using OnlineTest.Services.Interface;
+using OnlineTest.Services.Interfaces;
 
 namespace OnlineTest.Controllers
 {
     [Route("api/[controller]")]
-    //[Authorize]
     [ApiController]
+    //[Authorize]
     public class UserController : ControllerBase
     {
         #region Fields
@@ -26,7 +26,7 @@ namespace OnlineTest.Controllers
         [HttpGet]
         public IActionResult GetUsers()
         {
-            return Ok(_userService.GetUserDTO());
+            return Ok(_userService.GetUsers());
         }
 
         [HttpGet("paginated")]
@@ -44,13 +44,13 @@ namespace OnlineTest.Controllers
         [HttpPost]
         public IActionResult AddUser(AddUserDTO user)
         {
-            return Ok(_userService.AddUserDTO(user));
+            return Ok(_userService.AddUser(user));
         }
 
         [HttpPut]
         public IActionResult UpdateUser(UpdateUserDTO user)
         {
-            return Ok(_userService.UpdateUserDTO(user));
+            return Ok(_userService.UpdateUser(user));
         }
 
         [HttpDelete]

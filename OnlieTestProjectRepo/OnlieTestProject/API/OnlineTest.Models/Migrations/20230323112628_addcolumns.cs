@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace OnlineTest.Models.Migrations
 {
     /// <inheritdoc />
-    public partial class changesinmodels : Migration
+    public partial class addcolumns : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,35 +17,14 @@ namespace OnlineTest.Models.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    AName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    CreatedTime = table.Column<DateTime>(type: "datetime", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Answers", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Questions",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    QuestionName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Que = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Type = table.Column<int>(type: "int", nullable: false),
-                    Weightage = table.Column<int>(type: "int", nullable: false),
-                    TestId = table.Column<int>(type: "int", nullable: false),
-                    SortOrder = table.Column<int>(type: "int", nullable: false),
+                    Ans = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Questions", x => x.Id);
+                    table.PrimaryKey("PK_Answers", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -54,7 +33,7 @@ namespace OnlineTest.Models.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleName = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -68,11 +47,11 @@ namespace OnlineTest.Models.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TechName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
                     CreatedOn = table.Column<DateTime>(type: "datetime", nullable: false),
                     ModifiedBy = table.Column<int>(type: "int", nullable: true),
-                    ModifiedOn = table.Column<DateTime>(type: "datetime", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    ModifiedOn = table.Column<DateTime>(type: "datetime", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -85,10 +64,10 @@ namespace OnlineTest.Models.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MobileNo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    MobileNo = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(64)", maxLength: 64, nullable: false),
+                    Password = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -104,11 +83,11 @@ namespace OnlineTest.Models.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TestName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    CreatedTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ExpireOn = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpireOn = table.Column<DateTime>(type: "datetime", nullable: true),
                     TechnologyId = table.Column<int>(type: "int", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedBy = table.Column<int>(type: "int", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -122,22 +101,22 @@ namespace OnlineTest.Models.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "rTokens",
+                name: "RTokens",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Refresh_Token = table.Column<string>(type: "varchar(150)", nullable: false),
-                    Is_Stop = table.Column<int>(type: "int", nullable: false),
-                    Created_Date = table.Column<DateTime>(type: "datetime", nullable: false),
-                    User_Id = table.Column<int>(type: "int", nullable: false)
+                    RefreshToken = table.Column<string>(type: "nvarchar(32)", maxLength: 32, nullable: false),
+                    IsStop = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_rTokens", x => x.Id);
+                    table.PrimaryKey("PK_RTokens", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_rTokens_Users_User_Id",
-                        column: x => x.User_Id,
+                        name: "FK_RTokens_Users_UserId",
+                        column: x => x.UserId,
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
@@ -170,7 +149,68 @@ namespace OnlineTest.Models.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "QueAnsMap",
+                name: "Questions",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    QuestionName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Que = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
+                    Weightage = table.Column<int>(type: "int", nullable: false),
+                    SortOrder = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    TestId = table.Column<int>(type: "int", nullable: false),
+                    CreatedBy = table.Column<int>(type: "int", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Questions", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Questions_Tests_TestId",
+                        column: x => x.TestId,
+                        principalTable: "Tests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "TestLinks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TestId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Token = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    AccessOn = table.Column<DateTime>(type: "datetime", nullable: true),
+                    Attempts = table.Column<int>(type: "int", nullable: false),
+                    SubmitOn = table.Column<DateTime>(type: "datetime", nullable: true),
+                    ExpireOn = table.Column<DateTime>(type: "datetime", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedBy = table.Column<int>(type: "int", nullable: false),
+                    CreatedOn = table.Column<DateTime>(type: "datetime", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_TestLinks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_TestLinks_Tests_TestId",
+                        column: x => x.TestId,
+                        principalTable: "Tests",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_TestLinks_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "QuestionAnswerMapping",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -178,27 +218,27 @@ namespace OnlineTest.Models.Migrations
                     TestId = table.Column<int>(type: "int", nullable: false),
                     QuestionId = table.Column<int>(type: "int", nullable: false),
                     AnswerId = table.Column<int>(type: "int", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     CreatedBy = table.Column<int>(type: "int", nullable: false),
-                    CreatedTime = table.Column<DateTime>(type: "datetime", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                    CreatedOn = table.Column<DateTime>(type: "datetime", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_QueAnsMap", x => x.Id);
+                    table.PrimaryKey("PK_QuestionAnswerMapping", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_QueAnsMap_Answers_AnswerId",
+                        name: "FK_QuestionAnswerMapping_Answers_AnswerId",
                         column: x => x.AnswerId,
                         principalTable: "Answers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_QueAnsMap_Questions_QuestionId",
+                        name: "FK_QuestionAnswerMapping_Questions_QuestionId",
                         column: x => x.QuestionId,
                         principalTable: "Questions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_QueAnsMap_Tests_TestId",
+                        name: "FK_QuestionAnswerMapping_Tests_TestId",
                         column: x => x.TestId,
                         principalTable: "Tests",
                         principalColumn: "Id",
@@ -206,24 +246,39 @@ namespace OnlineTest.Models.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_QueAnsMap_AnswerId",
-                table: "QueAnsMap",
+                name: "IX_QuestionAnswerMapping_AnswerId",
+                table: "QuestionAnswerMapping",
                 column: "AnswerId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_QueAnsMap_QuestionId",
-                table: "QueAnsMap",
+                name: "IX_QuestionAnswerMapping_QuestionId",
+                table: "QuestionAnswerMapping",
                 column: "QuestionId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_QueAnsMap_TestId",
-                table: "QueAnsMap",
+                name: "IX_QuestionAnswerMapping_TestId",
+                table: "QuestionAnswerMapping",
                 column: "TestId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_rTokens_User_Id",
-                table: "rTokens",
-                column: "User_Id");
+                name: "IX_Questions_TestId",
+                table: "Questions",
+                column: "TestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RTokens_UserId",
+                table: "RTokens",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TestLinks_TestId",
+                table: "TestLinks",
+                column: "TestId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TestLinks_UserId",
+                table: "TestLinks",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tests_TechnologyId",
@@ -245,10 +300,13 @@ namespace OnlineTest.Models.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "QueAnsMap");
+                name: "QuestionAnswerMapping");
 
             migrationBuilder.DropTable(
-                name: "rTokens");
+                name: "RTokens");
+
+            migrationBuilder.DropTable(
+                name: "TestLinks");
 
             migrationBuilder.DropTable(
                 name: "UserRoles");
@@ -260,13 +318,13 @@ namespace OnlineTest.Models.Migrations
                 name: "Questions");
 
             migrationBuilder.DropTable(
-                name: "Tests");
-
-            migrationBuilder.DropTable(
                 name: "Roles");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Tests");
 
             migrationBuilder.DropTable(
                 name: "Technologies");

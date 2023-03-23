@@ -2,10 +2,10 @@
 using OnlineTest.Models;
 using OnlineTest.Models.Interfaces;
 using OnlineTest.Services.DTO;
-using OnlineTest.Services.DTO.Add_DTO;
-using OnlineTest.Services.DTO.Get_DTO;
+using OnlineTest.Services.DTO.AddDTO;
+using OnlineTest.Services.DTO.GetDTO;
 using OnlineTest.Services.DTO.UpdateDTO;
-using OnlineTest.Services.Interface;
+using OnlineTest.Services.Interfaces;
 
 namespace OnlineTest.Services.Services
 {
@@ -14,14 +14,16 @@ namespace OnlineTest.Services.Services
         #region Fields
         private readonly IMapper _mapper;
         private readonly IQuestionRepository _questionRepository;
+        private readonly IAnswerRepository _answerRepository;
         private readonly ITestRepository _testRepository;
         #endregion
 
         #region Constructor
-        public QuestionService(IMapper mapper, IQuestionRepository questionRepository, ITestRepository testRepository)
+        public QuestionService(IMapper mapper, IQuestionRepository questionRepository, IAnswerRepository answerRepository, ITestRepository testRepository)
         {
             _mapper = mapper;
             _questionRepository = questionRepository;
+            _answerRepository = answerRepository;
             _testRepository = testRepository;
         }
         #endregion
@@ -40,7 +42,7 @@ namespace OnlineTest.Services.Services
                     response.Error = "Test not found";
                     return response;
                 }
-                var data = _mapper.Map<List<GetQuestionsDTO>>(_questionRepository.GetQuestionsByTestId(testId).ToList());
+                var data = _mapper.Map<List<GetQuestionDTO>>(_questionRepository.GetQuestionsByTestId(testId).ToList());
                 response.Status = 200;
                 response.Message = "Ok";
                 response.Data = data;
@@ -59,15 +61,16 @@ namespace OnlineTest.Services.Services
             var response = new ResponseDTO();
             try
             {
-                var test = _questionRepository.GetQuestionsById(id);
-                if (test == null)
+                var question = _questionRepository.GetQuestionById(id);
+                if (question == null)
                 {
                     response.Status = 404;
                     response.Message = "Not Found";
                     response.Error = "Question not found";
                     return response;
                 }
-                var data = _mapper.Map<GetQuestionsDTO>(test);
+                var data = _mapper.Map<GetQuestionDTO>(question);
+                data.Answers = _mapper.Map<List<GetAnswerDTO>>(_answerRepository.GetAnswersByQuestionId(question.Id).ToList());
                 response.Status = 200;
                 response.Message = "Ok";
                 response.Data = data;
@@ -80,12 +83,101 @@ namespace OnlineTest.Services.Services
             }
             return response;
         }
+
+        public ResponseDTO AddQuestion(int userId, AddQuestionDTO question)
+        {
+            var response = new ResponseDTO();
+            try
+            {
+                var testById = _testRepository.GetTestById(question.TestId);
+                if (testById == null)
+                {
+                    response.Status = 400;
+                    response.Message = "Bad Request";
+                    response.Error = "Test does not exist";
+                    return response;
+                }
+                var questionExists = _questionRepository.QuestionExists(_mapper.Map<Question>(question));
+                if (questionExists != null)
+                {
+                    response.Status = 400;
+                    response.Message = "Not Created";
+                    response.Error = "Question already exists";
+                    return response;
+                }
+                question.IsActive = true;
+                question.CreatedBy = userId;
+                question.CreatedOn = DateTime.UtcNow;
+                var questionId = _questionRepository.AddQuestion(_mapper.Map<Question>(question));
+                if (questionId == 0)
+                {
+                    response.Status = 400;
+                    response.Message = "Not Created";
+                    response.Error = "Could not add question";
+                    return response;
+                }
+                response.Status = 201;
+                response.Message = "Created";
+                response.Data = questionId;
+            }
+            catch (Exception e)
+            {
+                response.Status = 500;
+                response.Message = "Internal Server Error";
+                response.Error = e.Message;
+            }
+            return response;
+        }
+
+        public ResponseDTO UpdateQuestion(UpdateQuestionDTO question)
+        {
+            var response = new ResponseDTO();
+            try
+            {
+                var questionById = _questionRepository.GetQuestionById(question.Id);
+                if (questionById == null)
+                {
+                    response.Status = 404;
+                    response.Message = "Not Found";
+                    response.Error = "Question not found";
+                    return response;
+                }
+                var questionExists = _questionRepository.QuestionExists(_mapper.Map<Question>(question));
+                if (questionExists != null && question.Id != questionExists.Id)
+                {
+                    response.Status = 400;
+                    response.Message = "Not Updated";
+                    response.Error = "Question already exists";
+                    return response;
+                }
+                var updateFlag = _questionRepository.UpdateQuestion(_mapper.Map<Question>(question));
+                if (updateFlag)
+                {
+                    response.Status = 204;
+                    response.Message = "Updated";
+                }
+                else
+                {
+                    response.Status = 400;
+                    response.Message = "Not Updated";
+                    response.Error = "Could not update question";
+                }
+            }
+            catch (Exception e)
+            {
+                response.Status = 500;
+                response.Message = "Internal Server Error";
+                response.Error = e.Message;
+            }
+            return response;
+        }
+
         public ResponseDTO DeleteQuestion(int id)
         {
             var response = new ResponseDTO();
             try
             {
-                var questionById = _questionRepository.GetQuestionsById(id);
+                var questionById = _questionRepository.GetQuestionById(id);
                 if (questionById == null)
                 {
                     response.Status = 404;
@@ -115,79 +207,6 @@ namespace OnlineTest.Services.Services
             }
             return response;
         }
-
-        public ResponseDTO AddQuestionDTO(AddQuestionDTO question)
-        {
-
-            var response = new ResponseDTO();
-            try
-            {
-                var testById = _testRepository.GetTestById(question.TestId);
-                if (testById == null)
-                {
-                    response.Status = 400;
-                    response.Message = "Bad Request";
-                    response.Error = "Test does not exist";
-                    return response;
-                }
-                question.IsActive = true;
-                question.CreatedOn = DateTime.UtcNow;
-                var questionId = _questionRepository.AddQuestion(_mapper.Map<Question>(question));
-                if (questionId == 0)
-                {
-                    response.Status = 400;
-                    response.Message = "Not Created";
-                    response.Error = "Could not add question";
-                    return response;
-                }
-                response.Status = 201;
-                response.Message = "Created";
-                response.Data = questionId;
-            }
-            catch (Exception e)
-            {
-                response.Status = 500;
-                response.Message = "Internal Server Error";
-                response.Error = e.Message;
-            }
-            return response;
-        }
-
-        public ResponseDTO UpdateQuestionDTO(UpdateQuestionDTO question)
-        {
-            var response = new ResponseDTO();
-            try
-            {
-                var questionById = _questionRepository.GetQuestionsById(question.Id);
-                if (questionById == null)
-                {
-                    response.Status = 404;
-                    response.Message = "Not Found";
-                    response.Error = "Question not found";
-                    return response;
-                }
-                var updateFlag = _questionRepository.UpdateQuestion(_mapper.Map<Question>(question));
-                if (updateFlag != null)
-                {
-                    response.Status = 204;
-                    response.Message = "Updated";
-                }
-                else
-                {
-                    response.Status = 400;
-                    response.Message = "Not Updated";
-                    response.Error = "Could not update question";
-                }
-            }
-            catch (Exception e)
-            {
-                response.Status = 500;
-                response.Message = "Internal Server Error";
-                response.Error = e.Message;
-            }
-            return response;
-        }
-
         #endregion
     }
 }

@@ -5,19 +5,19 @@ using OnlineTest.Services.DTO;
 using OnlineTest.Services.DTO.AddDTO;
 using OnlineTest.Services.DTO.GetDTO;
 using OnlineTest.Services.DTO.UpdateDTO;
-using OnlineTest.Services.Interface;
+using OnlineTest.Services.Interfaces;
 
 namespace OnlineTest.Services.Services
 {
     public class RTokenService : IRTokenService
     {
         #region Fields
-        private readonly IRTokenRepository _rTokenRepository;
         private readonly IMapper _mapper;
+        private readonly IRTokenRepository _rTokenRepository;
         #endregion
 
         #region Constructor
-        public RTokenService(IRTokenRepository rTokenRepository, IMapper mapper)
+        public RTokenService(IMapper mapper, IRTokenRepository rTokenRepository)
         {
             _mapper = mapper;
             _rTokenRepository = rTokenRepository;

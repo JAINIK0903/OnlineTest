@@ -10,9 +10,10 @@ namespace OnlineTest.Models.Interfaces
     {
         IEnumerable<Answer> GetAnswers();
         IEnumerable<Answer> GetAnswersByQuestionId(int questionId);
+        Answer GetAnswerById(int id);
+        Answer AnswerExists(int testId, int questionId, string ans);
         int AddAnswer(Answer answer);
-        int UpdateAnswer(Answer answer);
+        bool UpdateAnswer(Answer answer);
         bool DeleteAnswer(Answer answer);
-        Answer GetAnswersById(int id);
     }
 }

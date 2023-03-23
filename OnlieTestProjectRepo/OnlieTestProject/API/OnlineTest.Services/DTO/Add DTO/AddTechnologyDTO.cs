@@ -12,17 +12,14 @@ namespace OnlineTest.Services.DTO.Add_DTO
 {
     public class AddTechnologyDTO
     {
-        [Required]
-        [StringLength(20)]
+
+        [Required(ErrorMessage = "Name is required")]
+        [StringLength(20, ErrorMessage = "Name can not be longer than {1} characters")]
         public string TechName { get; set; }
 
         public int CreatedBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime CreatedOn { get; set; }= DateTime.Now;
-
-        //public int? ModifiedBy { get; set; }
-        //[Column(TypeName = "datetime")]
-        //public DateTime? ModifiedOn { get; set; }=DateTime.Now;
         public bool IsActive { get; set; } = true;
         
     }

@@ -12,8 +12,8 @@ using OnlineTest.Models;
 namespace OnlineTest.Models.Migrations
 {
     [DbContext(typeof(OnlineTestContext))]
-    [Migration("20230321051648_changeisactive")]
-    partial class changeisactive
+    [Migration("20230322073402_Initialcreate1")]
+    partial class Initialcreate1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -126,6 +126,8 @@ namespace OnlineTest.Models.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TestId");
 
                     b.ToTable("Questions");
                 });
@@ -330,6 +332,17 @@ namespace OnlineTest.Models.Migrations
                     b.Navigation("question");
 
                     b.Navigation("test");
+                });
+
+            modelBuilder.Entity("OnlineTest.Models.Question", b =>
+                {
+                    b.HasOne("OnlineTest.Models.Test", "TId")
+                        .WithMany()
+                        .HasForeignKey("TestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("TId");
                 });
 
             modelBuilder.Entity("OnlineTest.Models.RToken", b =>

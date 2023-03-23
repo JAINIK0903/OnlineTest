@@ -12,8 +12,8 @@ using OnlineTest.Models;
 namespace OnlineTest.Models.Migrations
 {
     [DbContext(typeof(OnlineTestContext))]
-    [Migration("20230321061753_isadmincolumn")]
-    partial class isadmincolumn
+    [Migration("20230322044719_Initialcreate")]
+    partial class Initialcreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -263,9 +263,6 @@ namespace OnlineTest.Models.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsAdmin")
                         .HasColumnType("bit");
 
                     b.Property<string>("MobileNo")

@@ -18,6 +18,7 @@ namespace OnlineTest.Services.DTO.Get_DTO
         public int weightage { get; set; }
         public int SortOrder { get; set; }
         public int CreatedBy { get; set; }
+        public List<GetAnswerDTO>? Answers { get; set; }
 
     }
 }

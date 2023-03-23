@@ -1,3 +1,4 @@
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -6,9 +7,9 @@ using OnlineTest.Models;
 using OnlineTest.Models.Interfaces;
 using OnlineTest.Models.Repository;
 using OnlineTest.Services.AutoMapperProfile;
-using OnlineTest.Services.Interface;
+using OnlineTest.Services.Interfaces;
 using OnlineTest.Services.Services;
-using System.Text;
+
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigureJwtAuthService(builder.Services);
@@ -19,8 +20,8 @@ builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(option =>
 {
-    //option.SwaggerDoc("v1", new OpenApiInfo { Title = "JWTDemo", Version = "v1" });
-    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    //option.SwaggerDoc("v1", new OpenApiInfo { Title = "JWTDemo", Version = "v1" });
+    option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
         Description = "Enter jwt access token",
@@ -29,22 +30,22 @@ builder.Services.AddSwaggerGen(option =>
         Scheme = "Bearer"
     });
     option.AddSecurityRequirement(new OpenApiSecurityRequirement
-  {
     {
-      new OpenApiSecurityScheme
-      {
-        Reference = new OpenApiReference
         {
-          Type = ReferenceType.SecurityScheme,
-          Id = "Bearer"
-        },
-        Scheme = "oauth2",
-        Name = "Bearer",
-        In = ParameterLocation.Header
-      },
-      new List<string>()
-    }
-  });
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                Scheme = "oauth2",
+                Name = "Bearer",
+                In = ParameterLocation.Header
+            },
+            new List<string>()
+        }
+    });
 });
 
 builder.Services.AddAutoMapper(typeof(MapperProfile));
@@ -54,10 +55,12 @@ builder.Services.AddDbContext<OnlineTestContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("OnlineTestConnString"), b => b.MigrationsAssembly("OnlineTest.Models"));
     options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
+
 #region Dependency Injection
 builder.Services.AddScoped<IHasherService, HasherService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserRoleService, UserRoleService>();
 builder.Services.AddScoped<IUserRoleRepository, UserRoleRepository>();
 builder.Services.AddScoped<IRTokenService, RTokenService>();
 builder.Services.AddScoped<IRTokenRepository, RTokenRepository>();
@@ -69,8 +72,10 @@ builder.Services.AddScoped<IQuestionService, QuestionService>();
 builder.Services.AddScoped<IQuestionRepository, QuestionRepository>();
 builder.Services.AddScoped<IAnswerService, AnswerService>();
 builder.Services.AddScoped<IAnswerRepository, AnswerRepository>();
-//builder.Services.AddScoped<IQuestionAnswerMapRepository, QuestionAnswerMapRepository>();
+builder.Services.AddScoped<IQuestionAnswerMapRepository, QuestionAnswerMapRepository>();
+builder.Services.AddScoped<ITestLinkRepository, TestLinkRepository>();
 #endregion
+
 var app = builder.Build();
 
 #region Configure HTTP request pipeline
@@ -115,7 +120,29 @@ void ConfigureJwtAuthService(IServiceCollection services)
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = signingKey,
+            RoleClaimType = "Role",
             ClockSkew = TimeSpan.Zero
         };
+        //var events = new JwtBearerEvents();
+        //events.OnAuthenticationFailed = async context =>
+        //{
+        //    //context.HandleResponse();
+        //    context.Response.StatusCode = 401;
+        //    context.Response.Headers.Append("UnAuthenticat", "");
+        //    await context.Response.WriteAsync(JsonConvert.SerializeObject(new
+        //    {
+        //        data = "",
+        //        status = 401,
+        //        message = "You are not Authenticat to use API."
+        //    }));
+        //};
+        //events.OnForbidden = async context =>
+        //{
+        //    //context.HandleResponse();
+        //    context.Response.StatusCode = 403;
+        //    context.Response.Headers.Append("UnAuthorized", "");
+        //    await context.Response.WriteAsync("403 Forbidden");
+        //};
+        //options.Events = events;
     });
 }

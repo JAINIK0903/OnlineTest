@@ -13,6 +13,7 @@ namespace OnlineTest.Models.Interfaces
         int AddQuestion(Question question);
         int UpdateQuestion(Question question);
         bool DeleteQuestion(Question question);
-        Question GetQuestionsById(int id);  
+        Question GetQuestionsById(int id);
+        Question QuestionExists(Question question);
     }
 }

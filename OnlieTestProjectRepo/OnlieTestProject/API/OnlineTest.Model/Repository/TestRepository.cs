@@ -1,50 +1,24 @@
 ﻿using OnlineTest.Models.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace OnlineTest.Models.Repository
 {
     public class TestRepository : ITestRepository
     {
+        #region Fields
         private readonly OnlineTestContext _context;
+        #endregion
+
+        #region Constructor
         public TestRepository(OnlineTestContext context)
         {
             _context = context;
         }
+        #endregion
 
-        public bool AddTest(Test test)
-        {
-            _context.Tests.Add(test);
-            return _context.SaveChanges() > 0;
-        }
-
-        public bool UpdateTest(Test test)
-        {
-            _context.Tests.Update(test);
-            return _context.SaveChanges() > 0;
-        }
-        public bool DeleteTest(Test test)
-        {
-            _context.Entry(test).Property("IsActive").IsModified = true;
-            return _context.SaveChanges() > 0;
-        }
-
-        public IEnumerable<Test> GetTestsPaginated(int pageNumber, int pageSize)
-        {
-            return _context.Tests.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
-        }
-        
-
+        #region Methods
         public IEnumerable<Test> GetTests()
         {
-            return _context.Tests.ToList();
-        }
-        public IEnumerable<Test> GetTestsByTechnologyId(int technologyId)
-        {
-            return _context.Tests.Where(t => t.TechnologyId == technologyId && t.IsActive == true).ToList();
+            return _context.Tests.Where(t => t.IsActive == true).ToList();
         }
 
         public Test GetTestById(int id)
@@ -52,6 +26,46 @@ namespace OnlineTest.Models.Repository
             return _context.Tests.FirstOrDefault(t => t.Id == id && t.IsActive == true);
         }
 
-        
+        public IEnumerable<Test> GetTestsPaginated(int page, int limit)
+        {
+            return _context.Tests.Where(t => t.IsActive == true).Skip((page - 1) * limit).Take(limit).ToList();
+        }
+
+        public IEnumerable<Test> GetTestsByTechnologyId(int technologyId)
+        {
+            return _context.Tests.Where(t => t.TechnologyId == technologyId && t.IsActive == true).ToList();
+        }
+
+        public Test TestExists(Test test)
+        {
+            var result = _context.Tests.FirstOrDefault(t => t.TechnologyId == test.TechnologyId && t.TestName == test.TestName && t.IsActive == true);
+            return result;
+        }
+
+        public int AddTest(Test test)
+        {
+            _context.Add(test);
+            if (_context.SaveChanges() > 0)
+                return test.Id;
+            else
+                return 0;
+        }
+
+        public bool UpdateTest(Test test)
+        {
+            _context.Entry(test).Property("TestName").IsModified = true;
+            _context.Entry(test).Property("Description").IsModified = true;
+            _context.Entry(test).Property("ExpireOn").IsModified = true;
+            return _context.SaveChanges() > 0;
+        }
+
+        public bool DeleteTest(Test test)
+        {
+            _context.Entry(test).Property("IsActive").IsModified = true;
+            return _context.SaveChanges() > 0;
+        }
+
+     
+        #endregion
     }
 }

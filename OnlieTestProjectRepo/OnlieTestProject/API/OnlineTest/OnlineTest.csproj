@@ -7,17 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="OnlineTestContext.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.14" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OnlineTest.Model\OnlineTest.Models.csproj" />
+    <ProjectReference Include="..\OnlineTest.Models\OnlineTest.Models.csproj" />
     <ProjectReference Include="..\OnlineTest.Services\OnlineTest.Services.csproj" />
   </ItemGroup>
 

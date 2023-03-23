@@ -1,14 +1,15 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OnlineTest.Services.DTO.Add_DTO;
+using OnlineTest.Services.DTO.AddDTO;
 using OnlineTest.Services.DTO.UpdateDTO;
-using OnlineTest.Services.Interface;
+using OnlineTest.Services.Interfaces;
 
 namespace OnlineTest.Controllers
 {
     [Route("api/[controller]")]
-    [Authorize]
     [ApiController]
+    [Authorize]
     public class QuestionController : ControllerBase
     {
         #region Fields
@@ -38,13 +39,13 @@ namespace OnlineTest.Controllers
         [HttpPost]
         public IActionResult AddQuestion(AddQuestionDTO question)
         {
-            return Ok(_questionService.AddQuestionDTO(question));
+            return Ok(_questionService.AddQuestion(Convert.ToInt32(User.FindFirstValue("Id")), question));
         }
 
         [HttpPut]
         public IActionResult UpdateQuestion(UpdateQuestionDTO question)
         {
-            return Ok(_questionService.UpdateQuestionDTO(question));
+            return Ok(_questionService.UpdateQuestion(question));
         }
 
         [HttpDelete]
