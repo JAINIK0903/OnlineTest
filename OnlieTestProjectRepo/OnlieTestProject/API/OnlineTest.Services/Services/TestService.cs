@@ -325,6 +325,41 @@ namespace OnlineTest.Services.Services
             }
             return response;
         }
+
+        public ResponseDTO GetTestByLink(string token, string email)
+        {
+            var response = new ResponseDTO();
+            try
+            {
+               var testlink= _testLinkRepository.GetTestLink(Guid.Parse(token));
+                if(testlink == null) 
+                {
+                    response.Status= 404;
+                    response.Message ="not found";
+                    response.Error = "test link does not exist or expired";
+                    return response;
+                }
+                var testId=testlink.TestId;
+                var userId = testlink.UserId;
+                var user=_userRepository.GetUserById(userId);
+                if(email.ToLower() != user.Email.ToLower())
+                {
+                    response.Status = 400;
+                    response.Message = "Bad Request";
+                    response.Error = "emial is incorrect";
+                    return response;
+                }
+                return GetTestById(testId);
+            }
+            catch (Exception e) 
+            {
+                response.Status=500;
+                response.Message = "internal server error";
+                response.Error = e.Message;
+                return response;
+            }
+           
+        }
         #endregion
     }
 }

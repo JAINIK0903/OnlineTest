@@ -8,7 +8,7 @@ namespace OnlineTest.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    //[Authorize]
+    [Authorize]
     public class UserController : ControllerBase
     {
         #region Fields
