@@ -65,6 +65,7 @@ namespace OnlineTest.Controllers
         {
             return Ok(_testService.AddTestLink(Convert.ToInt32(User.FindFirstValue("Id")), testId, email));
         }
+
         [HttpGet("link")]
         public IActionResult GetTestByLink(string token, string email)
         {

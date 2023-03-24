@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineTest.Models;
 
@@ -11,9 +12,11 @@ using OnlineTest.Models;
 namespace OnlineTest.Models.Migrations
 {
     [DbContext(typeof(OnlineTestContext))]
-    partial class OnlineTestContextModelSnapshot : ModelSnapshot
+    [Migration("20230313093456_ModifyDateTimeColumns")]
+    partial class ModifyDateTimeColumns
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,32 +24,6 @@ namespace OnlineTest.Models.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("OnlineTest.Models.Answer", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Ans")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Answers");
-                });
 
             modelBuilder.Entity("OnlineTest.Models.Question", b =>
                 {
@@ -56,15 +33,6 @@ namespace OnlineTest.Models.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<string>("Que")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -72,9 +40,6 @@ namespace OnlineTest.Models.Migrations
                     b.Property<string>("QuestionName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("int");
 
                     b.Property<int>("TestId")
                         .HasColumnType("int");
@@ -92,43 +57,6 @@ namespace OnlineTest.Models.Migrations
                     b.ToTable("Questions");
                 });
 
-            modelBuilder.Entity("OnlineTest.Models.QuestionAnswerMap", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AnswerId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TestId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AnswerId");
-
-                    b.HasIndex("QuestionId");
-
-                    b.HasIndex("TestId");
-
-                    b.ToTable("QuestionAnswerMapping");
-                });
-
             modelBuilder.Entity("OnlineTest.Models.RToken", b =>
                 {
                     b.Property<int>("Id")
@@ -137,7 +65,7 @@ namespace OnlineTest.Models.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<DateTime>("CreatedOn")
+                    b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime");
 
                     b.Property<bool>("IsStop")
@@ -190,9 +118,6 @@ namespace OnlineTest.Models.Migrations
                     b.Property<DateTime>("CreatedOn")
                         .HasColumnType("datetime");
 
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
                     b.Property<int?>("ModifiedBy")
                         .HasColumnType("int");
 
@@ -204,6 +129,10 @@ namespace OnlineTest.Models.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("ModifiedBy");
 
                     b.ToTable("Technologies");
                 });
@@ -219,18 +148,15 @@ namespace OnlineTest.Models.Migrations
                     b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("CreatedOn")
+                    b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("ExpireOn")
+                    b.Property<DateTime>("ExpireOn")
                         .HasColumnType("datetime");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<int>("TechnologyId")
                         .HasColumnType("int");
@@ -241,57 +167,11 @@ namespace OnlineTest.Models.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CreatedBy");
+
                     b.HasIndex("TechnologyId");
 
                     b.ToTable("Tests");
-                });
-
-            modelBuilder.Entity("OnlineTest.Models.TestLink", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("AccessOn")
-                        .HasColumnType("datetime");
-
-                    b.Property<int>("Attempts")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime");
-
-                    b.Property<DateTime>("ExpireOn")
-                        .HasColumnType("datetime");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("SubmitOn")
-                        .HasColumnType("datetime");
-
-                    b.Property<int>("TestId")
-                        .HasColumnType("int");
-
-                    b.Property<Guid>("Token")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TestId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("TestLinks");
                 });
 
             modelBuilder.Entity("OnlineTest.Models.User", b =>
@@ -364,33 +244,6 @@ namespace OnlineTest.Models.Migrations
                     b.Navigation("Test");
                 });
 
-            modelBuilder.Entity("OnlineTest.Models.QuestionAnswerMap", b =>
-                {
-                    b.HasOne("OnlineTest.Models.Answer", "Answer")
-                        .WithMany()
-                        .HasForeignKey("AnswerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("OnlineTest.Models.Question", "Question")
-                        .WithMany()
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("OnlineTest.Models.Test", "Test")
-                        .WithMany()
-                        .HasForeignKey("TestId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Answer");
-
-                    b.Navigation("Question");
-
-                    b.Navigation("Test");
-                });
-
             modelBuilder.Entity("OnlineTest.Models.RToken", b =>
                 {
                     b.HasOne("OnlineTest.Models.User", "User")
@@ -402,8 +255,32 @@ namespace OnlineTest.Models.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("OnlineTest.Models.Technology", b =>
+                {
+                    b.HasOne("OnlineTest.Models.User", "UserCreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("OnlineTest.Models.User", "UserModifiedBy")
+                        .WithMany()
+                        .HasForeignKey("ModifiedBy")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("UserCreatedBy");
+
+                    b.Navigation("UserModifiedBy");
+                });
+
             modelBuilder.Entity("OnlineTest.Models.Test", b =>
                 {
+                    b.HasOne("OnlineTest.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("CreatedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("OnlineTest.Models.Technology", "Technology")
                         .WithMany()
                         .HasForeignKey("TechnologyId")
@@ -411,23 +288,6 @@ namespace OnlineTest.Models.Migrations
                         .IsRequired();
 
                     b.Navigation("Technology");
-                });
-
-            modelBuilder.Entity("OnlineTest.Models.TestLink", b =>
-                {
-                    b.HasOne("OnlineTest.Models.Test", "Test")
-                        .WithMany()
-                        .HasForeignKey("TestId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("OnlineTest.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Test");
 
                     b.Navigation("User");
                 });

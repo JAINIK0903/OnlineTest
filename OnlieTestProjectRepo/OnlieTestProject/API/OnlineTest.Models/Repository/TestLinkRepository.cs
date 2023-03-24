@@ -18,7 +18,7 @@ namespace OnlineTest.Models.Repository
         #region Methods
         public TestLink GetTestLink(Guid token)
         {
-           return _context.TestLinks.FirstOrDefault(t => t.Token == token && t.ExpireOn > DateTime.UtcNow);
+            return _context.TestLinks.FirstOrDefault(t => t.Token == token && t.ExpireOn > DateTime.UtcNow);
         }
 
         public int AddTestLink(TestLink testLink)
