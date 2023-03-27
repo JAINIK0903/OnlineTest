@@ -40,10 +40,10 @@ namespace OnlineTest.Models.Repository
         }
         public bool UpdateTestLink(TestLink testLink)
         {
+            foreach (var link in _context.TestLinks)
             _context.Entry(testLink).Property("AccessOn").IsModified = true;
             _context.Entry(testLink).Property("Attempts").IsModified = true;
             _context.Entry(testLink).Property("SubmitOn").IsModified = true;
-            _context.Entry(testLink).Property("").IsModified = true;
             return _context.SaveChanges() > 0;
         }
         #endregion

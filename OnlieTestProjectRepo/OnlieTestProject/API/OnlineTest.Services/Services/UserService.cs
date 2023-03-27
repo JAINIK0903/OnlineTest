@@ -171,7 +171,6 @@ namespace OnlineTest.Services.Services
             }
             return response;
         }
-
         public ResponseDTO UpdateUser(UpdateUserDTO user)
         {
             var response = new ResponseDTO();
