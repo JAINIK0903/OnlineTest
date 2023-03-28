@@ -299,7 +299,7 @@ namespace OnlineTest.Services.Services
                     response.Error = "Test does not exist";
                     return response;
                 }
-
+                
                 // check if link has already been created and not expired
                 var existFlag = _testLinkRepository.IsTestLinkExists(testId, userId);
                 if (existFlag)
@@ -343,12 +343,12 @@ namespace OnlineTest.Services.Services
             return response;
         }
         
-        public ResponseDTO GetTestByLink(string token, string email)
+        public ResponseDTO GetTestByLink(Guid token, string email)
         {
             var response = new ResponseDTO();
             try
             {
-                var testLink = _testLinkRepository.GetTestLink(Guid.Parse(token));
+                var testLink = _testLinkRepository.GetTestLink(token);
                 if (testLink == null)
                 {
                     response.Status = 404;
@@ -367,6 +367,12 @@ namespace OnlineTest.Services.Services
                     response.Message = "Bad Request";
                     response.Error = "Email is incorrect";
                     return response;
+                }
+                if(token!=testLink.Token) 
+                {
+                    response.Status= 400;
+                    response.Message = "Bad Request";
+                    response.Error = "token is not valid";
                 }
                 //check if test has already submitted
                 if(testLink.SubmitOn != null) 
@@ -396,6 +402,21 @@ namespace OnlineTest.Services.Services
             var response = new ResponseDTO();
             try
             {
+                var testLink= _testLinkRepository.GetTestLink(answerSheet.Token);
+                if (testLink.SubmitOn != null)
+                {
+                    response.Status = 400;
+                    response.Message = "Bad Request";
+                    response.Error = "test has already submitted";
+                    return response;
+                }
+                if (testLink.ExpireOn <= DateTime.UtcNow) 
+                {
+                    response.Status = 400;
+                    response.Message = "Bad Request";
+                    response.Error = "Test link has expired";
+                    return response;
+                }
                 answerSheet.CreatedOn = DateTime.UtcNow;
                 List<AnswerSheet> answerSheets = new List<AnswerSheet>();
 
@@ -411,11 +432,10 @@ namespace OnlineTest.Services.Services
                        answerSheets.Add(sheet);
                 }
                 _answerSheetRepository.AddAnswerSheet(answerSheets);
-                var testLink= _testLinkRepository.GetTestLink(answerSheet.Token);
+                testLink.SubmitOn = DateTime.UtcNow;
                 _testLinkRepository.UpdateTestLink(testLink);
                 response.Status = 200;
                 response.Message = "Ok";
-                response.Data = answerSheet;
             }
             catch (Exception e)
             {
