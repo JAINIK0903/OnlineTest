@@ -20,7 +20,12 @@ namespace OnlineTest.Models.Repository
         {
             return _context.TestLinks.FirstOrDefault(t => t.Token == token && t.ExpireOn > DateTime.UtcNow);
         }
-
+        public MailOutbound GetMailDetails(int testLinkId)
+        {
+            var testlink = _context.mailOutbounds.FirstOrDefault(i => i.TestLinkId == testLinkId);
+            _context.SaveChanges();
+            return testlink;
+        }
         public int AddTestLink(TestLink testLink)
         {
             _context.Add(testLink);

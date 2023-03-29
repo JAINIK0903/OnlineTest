@@ -36,7 +36,10 @@ namespace OnlineTest.Models.Repository
                         CreatedOn = a.CreatedOn
                     }).ToList();
         }
-
+        //public IEnumerable<Answer> GetCorrectAnswerQuestionById(int questionId, int answerId) 
+        //{
+            
+        //}
         public Answer GetAnswerById(int id)
         {
             return _context.Answers.FirstOrDefault(a => a.Id == id && a.IsActive == true);

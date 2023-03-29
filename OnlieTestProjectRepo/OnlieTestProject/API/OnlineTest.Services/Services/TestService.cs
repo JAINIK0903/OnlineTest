@@ -13,6 +13,8 @@ namespace OnlineTest.Services.Services
     {
         #region Fields
         private readonly IMapper _mapper;
+        private readonly IMailService _mailService;
+        private readonly IMailOutboundRepository _mailOutboundRepository;
         private readonly ITestRepository _testRepository;
         private readonly IQuestionRepository _questionRepository;
         private readonly IAnswerRepository _answerRepository;
@@ -24,9 +26,11 @@ namespace OnlineTest.Services.Services
         #endregion
 
         #region Constructor
-        public TestService(IMapper mapper, IUserRoleRepository userRoleRepository ,ITestRepository testRepository, IQuestionRepository questionRepository, IAnswerRepository answerRepository, IAnswerSheetRepository answersheetRepository, ITechnologyRepository technologyRepository, ITestLinkRepository testLinkRepository, IUserRepository userRepository)
+        public TestService(IMapper mapper, IMailService mailService, IMailOutboundRepository mailOutboundRepository ,IUserRoleRepository userRoleRepository ,ITestRepository testRepository, IQuestionRepository questionRepository, IAnswerRepository answerRepository, IAnswerSheetRepository answersheetRepository, ITechnologyRepository technologyRepository, ITestLinkRepository testLinkRepository, IUserRepository userRepository)
         {
             _mapper = mapper;
+            _mailService = mailService;
+            _mailOutboundRepository = mailOutboundRepository;
             _testRepository = testRepository;
             _questionRepository = questionRepository;
             _answerRepository = answerRepository;
@@ -330,6 +334,26 @@ namespace OnlineTest.Services.Services
                     response.Error = "Could not add test link";
                     return response;
                 }
+                // send email to candidate
+                var mail = new MailDTO
+                {
+                    To = email,
+                    Subject = "Link to begin test",
+                    Body = $"<p>Hi,</p><p>Here is your <a href=\"{testLink.Token}\" target=\"_blank\">link</a> to begin the test.</p><p>All the best!</p>"
+                };
+                _mailService.SendMail(mail);
+
+                // store record in email outbound table
+                var mailOutbound = new MailOutbound
+                {
+                    To = mail.To,
+                    Content = mail.Body,
+                    TestLinkId = testLinkId,
+                    CreatedBy = adminId,
+                    CreatedOn = DateTime.UtcNow
+                };
+                _mailOutboundRepository.AddMailOutbound(mailOutbound);
+
                 response.Status = 201;
                 response.Message = "Created";
                 response.Data = testLinkId;
@@ -397,6 +421,7 @@ namespace OnlineTest.Services.Services
             }
             return response;
         }
+      
         public ResponseDTO SubmitTest(AddAnswerSheetDTO answerSheet)
         {
             var response = new ResponseDTO();

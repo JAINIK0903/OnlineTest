@@ -17,6 +17,7 @@ namespace OnlineTest.Models
         public int CreatedBy { get; set; }
         [Column(TypeName = "datetime")]
         public DateTime CreatedOn { get; set; }
+        public bool? IsAnswer { get; set; }
         public Test Test { get; set; }
         public Question Question { get; set; }
         public Answer Answer { get; set; }

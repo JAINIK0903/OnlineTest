@@ -11,5 +11,6 @@ namespace OnlineTest.Services.DTO.AddDTO
         public DateTime CreatedOn { get; set; }
         public int TestId { get; set; }
         public int QuestionId { get; set; }
+        public bool IsAnswer { get; set; }
     }
 }

@@ -98,6 +98,7 @@ namespace OnlineTest.Services.Services
                     response.Error = "Test not found";
                     return response;
                 }
+                
                 var questionById = _questionRepository.GetQuestionById(answer.QuestionId);
                 if (questionById == null)
                 {
@@ -133,7 +134,9 @@ namespace OnlineTest.Services.Services
                     IsActive = true,
                     CreatedBy = answer.CreatedBy,
                     CreatedOn = answer.CreatedOn,
+                    IsAnswer = answer.IsAnswer
                 };
+
                 _qaMapRepository.AddMap(map);
                 response.Status = 201;
                 response.Message = "Created";

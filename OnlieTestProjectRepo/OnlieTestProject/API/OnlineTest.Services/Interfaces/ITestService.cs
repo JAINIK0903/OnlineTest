@@ -15,6 +15,7 @@ namespace OnlineTest.Services.Interfaces
         ResponseDTO DeleteTest(int id);
         ResponseDTO AddTestLink(int adminId, int testId, string email);
         ResponseDTO GetTestByLink(Guid token, string email);
+        //ResponseDTO GetMailDetails(int testLinkId);
         ResponseDTO SubmitTest(AddAnswerSheetDTO answerSheet);
     }
 }

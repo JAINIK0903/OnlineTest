@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OnlineTest.Models.Interfaces;
+using OnlineTest.Services.DTO;
 using OnlineTest.Services.DTO.AddDTO;
 using OnlineTest.Services.DTO.UpdateDTO;
 using OnlineTest.Services.Interfaces;
@@ -14,12 +16,16 @@ namespace OnlineTest.Controllers
     {
         #region Fields
         private readonly ITestService _testService;
+        private readonly IMailService _mailService;
+        private readonly IMailOutboundRepository _mailOutboundRepository;
         #endregion
 
         #region Constructor
-        public TestController(ITestService testService)
+        public TestController(ITestService testService, IMailOutboundRepository mailOutboundRepository)
         {
             _testService = testService;
+            _mailOutboundRepository = mailOutboundRepository;
+
         }
         #endregion
 
@@ -76,6 +82,7 @@ namespace OnlineTest.Controllers
         {
             return Ok(_testService.SubmitTest(answerSheet));
         }
+        
         #endregion
     }
 }

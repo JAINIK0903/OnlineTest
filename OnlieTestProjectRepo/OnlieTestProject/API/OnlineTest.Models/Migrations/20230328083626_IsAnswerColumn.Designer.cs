@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OnlineTest.Models;
 
@@ -11,9 +12,11 @@ using OnlineTest.Models;
 namespace OnlineTest.Models.Migrations
 {
     [DbContext(typeof(OnlineTestContext))]
-    partial class OnlineTestContextModelSnapshot : ModelSnapshot
+    [Migration("20230328083626_IsAnswerColumn")]
+    partial class IsAnswerColumn
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -71,38 +74,6 @@ namespace OnlineTest.Models.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AnswerSheets");
-                });
-
-            modelBuilder.Entity("OnlineTest.Models.MailOutbound", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("CreatedBy")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime");
-
-                    b.Property<int>("TestLinkId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("To")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TestLinkId");
-
-                    b.ToTable("mailOutbounds");
                 });
 
             modelBuilder.Entity("OnlineTest.Models.Question", b =>
@@ -410,17 +381,6 @@ namespace OnlineTest.Models.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserRoles");
-                });
-
-            modelBuilder.Entity("OnlineTest.Models.MailOutbound", b =>
-                {
-                    b.HasOne("OnlineTest.Models.TestLink", "TestLink")
-                        .WithMany()
-                        .HasForeignKey("TestLinkId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("TestLink");
                 });
 
             modelBuilder.Entity("OnlineTest.Models.Question", b =>
